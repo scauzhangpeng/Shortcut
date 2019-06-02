@@ -1,6 +1,10 @@
 package com.muugi.shortcut.sample;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -19,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.muugi.shortcut.core.IntentSenderHelper;
 import com.muugi.shortcut.core.ShortcutHelper;
 import com.muugi.shortcut.core.ShortcutInfoHelper;
 import com.muugi.shortcut.sample.base.MultipleTypeSupport;
@@ -46,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private ShortcutReceiver mShortcutReceiver = new ShortcutReceiver();
+    private static final String ACTION = "com.muugi.shortcut";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         initRvContact();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION);
+        registerReceiver(mShortcutReceiver, intentFilter);
     }
 
     private void initRvContact() {
@@ -85,19 +96,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mShortcutReceiver);
+    }
 
     private void createShortcut(String id, String label, String longLabel, boolean isBadged, Bitmap drawable, @DrawableRes int defaultDrawable) {
 
         ShortcutInfoHelper.Builder builder = new ShortcutInfoHelper.Builder(this, id)
                 .setShortAndLongLabel(label)
                 .setIcon(drawable)
-                .setAlwaysBadged()
                 .setIntent(new Intent(this, MainActivity.class));
         if (isBadged) {
             builder.setAlwaysBadged();
         }
         ShortcutInfoCompat infoCompat = builder.build();
-        ShortcutHelper.requestPinShortcut(this, infoCompat, null, true, new ShortcutHelper.ShortcutCallback() {
+        IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(this, ACTION);
+        ShortcutHelper.requestPinShortcut(this, infoCompat, defaultIntentSender, true, new ShortcutHelper.ShortcutCallback() {
             @Override
             public void isShortcutUpdate(boolean isSuccess) {
                 Log.d(TAG, "isShortcutUpdate: 快捷方式已更新?" + isSuccess);
@@ -110,6 +126,19 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "快捷方式已尝试创建？" + isSuccess, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public static class ShortcutReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG, "onReceive: action = " + action);
+            if (ACTION.equals(action)) {
+                Log.d(TAG, "onReceive: 快捷方式创建结果广播回调");
+                Toast.makeText(context,"快捷方式创建结果广播回调", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 
