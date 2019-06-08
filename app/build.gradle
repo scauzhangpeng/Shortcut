@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.muugi.shortcut.sample"
         minSdkVersion 18
         targetSdkVersion 28
         versionCode 1
@@ -14,6 +13,22 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "applicationId"
+
+    productFlavors {
+        defaultConfig {
+            applicationId "com.muugi.shortcut.sample"
+            dimension "applicationId"
+            manifestPlaceholders = [appName : "@string/app_name"]
+        }
+
+        kugou {
+            applicationId "com.kugou.android"
+            dimension "applicationId"
+            manifestPlaceholders = [appName : "@string/app_name_kugou"]
         }
     }
 }
