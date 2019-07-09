@@ -1,34 +1,22 @@
 package com.muugi.shortcut.sample;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.v4.content.pm.ShortcutInfoCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.muugi.shortcut.core.IntentSenderHelper;
-import com.muugi.shortcut.core.ShortcutHelper;
-import com.muugi.shortcut.core.ShortcutInfoHelper;
+import com.muugi.shortcut.Shortcut;
 import com.muugi.shortcut.sample.base.MultipleTypeSupport;
 import com.muugi.shortcut.sample.bean.Group;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
@@ -51,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private ShortcutReceiver mShortcutReceiver = new ShortcutReceiver();
     private static final String ACTION = "com.muugi.shortcut";
 
 
@@ -61,9 +48,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         initRvContact();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ACTION);
-        registerReceiver(mShortcutReceiver, intentFilter);
     }
 
     private void initRvContact() {
@@ -76,12 +60,33 @@ public class MainActivity extends AppCompatActivity {
         mContactAdapter.setOnItemCreateClickListener(new ContactAdapter.OnItemCreateClickListener() {
             @Override
             public void onClick(View view, Group contact, Drawable drawable) {
-                createShortcut(contact.getUid(),
-                        contact.getNickname(),
-                        contact.getNickname(),
-                        contact.isShowBadged(),
-                        ImageUtils.drawable2Bitmap(drawable),
-                        R.drawable.hugh);
+                Shortcut.get()
+                        .pin(MainActivity.this)
+                        .info(contact.getUid())
+                        .setAlwaysBadge()
+                        .setIcon(drawable)
+                        .setShortLabel(contact.getNickname())
+                        .setLongLabel(contact.getNickname())
+                        .setDisabledMessage(contact.getNickname())
+                        .updateIfExist(true)
+                        .createWithSameName(true)
+                        .iconShapeWithLauncher(true)
+                        .setIntent(MainActivity.class)
+                        .onCreated(result -> {
+                            Log.d(TAG, "onCreated: " + result);
+                            Toast.makeText(MainActivity.this.getApplicationContext(),"onCreated", Toast.LENGTH_LONG).show();
+                        })
+                        .onAsyncCreate(result -> {
+                            Log.d(TAG, "onAsyncCreate: " + result);
+                            Toast.makeText(MainActivity.this.getApplicationContext(),"onAsyncCreate", Toast.LENGTH_LONG).show();
+                        })
+                        .onUpdated(result -> {
+                            Log.d(TAG, "onUpdated: " + result);
+                            Toast.makeText(MainActivity.this.getApplicationContext(),"onUpdated", Toast.LENGTH_LONG).show();
+                        })
+                        .start();
+
+
             }
         });
     }
@@ -91,7 +96,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_to_permission_v1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ShortcutHelper.toPermissionSetting(MainActivity.this);
+                Shortcut.get()
+                        .setting(MainActivity.this)
+                        .start();
             }
         });
     }
@@ -99,69 +106,39 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mShortcutReceiver);
+        fixInputMethodManagerLeak(this);
+        Shortcut.get().release();
     }
-
-    private void createShortcut(String id, String label, String longLabel, boolean isBadged, Bitmap drawable, @DrawableRes int defaultDrawable) {
-
-        ShortcutInfoHelper.Builder builder = new ShortcutInfoHelper.Builder(this, id)
-                .setShortAndLongLabel(label)
-                .setIcon(drawable)
-                .setIntent(new Intent(this, MainActivity.class));
-        if (isBadged) {
-            builder.setAlwaysBadged();
+    public static void fixInputMethodManagerLeak(Context destContext) {
+        if (destContext == null) {
+            return;
         }
-        ShortcutInfoCompat infoCompat = builder.build();
-        IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(this, ACTION);
-        ShortcutHelper.requestPinShortcut(this, infoCompat, defaultIntentSender, true, new ShortcutHelper.ShortcutCallback() {
-            @Override
-            public void isShortcutUpdate(boolean isSuccess) {
-                Log.d(TAG, "isShortcutUpdate: 快捷方式已更新?" + isSuccess);
-                Toast.makeText(getApplicationContext(), "快捷方式已更新？" + isSuccess, Toast.LENGTH_LONG).show();
-            }
 
-            @Override
-            public void isShortcutCreate(boolean isSuccess) {
-                Log.d(TAG, "isShortcutCreate: 快捷方式已尝试创建" + isSuccess);
-                Toast.makeText(getApplicationContext(), "快捷方式已尝试创建？" + isSuccess, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
+        InputMethodManager imm = (InputMethodManager) destContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) {
+            return;
+        }
 
-    public static class ShortcutReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.d(TAG, "onReceive: action = " + action);
-            if (ACTION.equals(action)) {
-                Log.d(TAG, "onReceive: 快捷方式创建结果广播回调");
-                Toast.makeText(context,"快捷方式创建结果广播回调", Toast.LENGTH_LONG).show();
+        String[] arr = new String[]{"mCurRootView", "mServedView", "mNextServedView", "mLastSrvView"};
+        Field f = null;
+        Object obj_get = null;
+        for (int i = 0; i < arr.length; i++) {
+            String param = arr[i];
+            try {
+                f = imm.getClass().getDeclaredField(param);
+                if (!f.isAccessible()) {
+                    f.setAccessible(true);
+                }
+                obj_get = f.get(imm);
+                if (obj_get instanceof View) {
+                    View v_get = (View) obj_get;
+                    if (v_get.getContext() == destContext) { // 被InputMethodManager持有引用的context是想要目标销毁的
+                        f.set(imm, null); // 置空，破坏掉path to gc节点
+                    }
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
         }
-    }
-
-
-    private Bitmap merge(Bitmap bitmap) {
-        try {
-            Bitmap mask = ImageUtils.drawable2Bitmap(getPackageManager().getApplicationIcon(getPackageName()));
-            int width = mask.getWidth();
-            int height = mask.getHeight();
-            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, (int) (1.5 * width), (int) (1.5 * height), true);
-            Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas();
-            canvas.setBitmap(result);
-            Paint paint = new Paint();
-            canvas.drawBitmap(mask, 0, 0, paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmapScale, -width / 14.0f - 40, -height / 14.0f - 40, paint);
-//            canvas.save(Canvas.ALL_SAVE_FLAG);
-            canvas.save();
-            canvas.restore();
-            return result;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

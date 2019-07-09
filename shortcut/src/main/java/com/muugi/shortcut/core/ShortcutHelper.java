@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.pm.ShortcutInfoCompat;
 import android.support.v4.content.pm.ShortcutManagerCompat;
 
+import com.muugi.shortcut.setting.RuntimeSettingPage;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class ShortcutHelper {
     public static boolean requestPinShortcut(@NonNull Context context, @NonNull ShortcutInfoCompat infoCompat,
                                              @Nullable IntentSender intentSender,
                                              boolean isUpdateAuto, @Nullable ShortcutCallback callback) {
-        if (isUpdateAuto && isShortcutExit(context, infoCompat.getId(), infoCompat.getShortLabel().toString())) {
+        if (isUpdateAuto && isShortcutExit(context, infoCompat.getId())) {
             boolean isUpdateSuccess = updatePinShortcut(context, infoCompat);
             if (callback != null) {
                 callback.isShortcutUpdate(isUpdateSuccess);
@@ -46,7 +48,7 @@ public class ShortcutHelper {
     }
 
 
-    private static boolean updatePinShortcut(Context context, ShortcutInfoCompat info) {
+    public static boolean updatePinShortcut(Context context, ShortcutInfoCompat info) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             ShortcutManager mShortcutManager =
                     context.getSystemService(ShortcutManager.class);
@@ -59,7 +61,7 @@ public class ShortcutHelper {
         return false;
     }
 
-    public static boolean isShortcutExit(@NonNull Context context, @NonNull String id, @Nullable String label) {
+    public static boolean isShortcutExit(@NonNull Context context, @NonNull String id) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             ShortcutManager mShortcutManager =
                     context.getSystemService(ShortcutManager.class);

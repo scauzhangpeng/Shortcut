@@ -1,6 +1,7 @@
-package com.muugi.shortcut.sample;
+package com.muugi.shortcut.utils;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -36,7 +37,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
-
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -932,7 +932,7 @@ public class ImageUtils {
                 0x00FFFFFF,
                 Shader.TileMode.MIRROR);
         paint.setShader(shader);
-        paint.setXfermode(new PorterDuffXfermode(android.graphics.PorterDuff.Mode.DST_IN));
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
         canvas.drawRect(0, srcHeight + REFLECTION_GAP, srcWidth, ret.getHeight(), paint);
         if (!reflectionBitmap.isRecycled()) reflectionBitmap.recycle();
         if (recycle && !src.isRecycled() && ret != src) src.recycle();
@@ -1742,7 +1742,7 @@ public class ImageUtils {
                                            final boolean recycle) {
         if (isEmptyBitmap(src)) return null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        src.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+        src.compress(CompressFormat.JPEG, quality, baos);
         byte[] bytes = baos.toByteArray();
         if (recycle && !src.isRecycled()) src.recycle();
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
@@ -1837,7 +1837,7 @@ public class ImageUtils {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = sampleSize;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        src.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        src.compress(CompressFormat.JPEG, 100, baos);
         byte[] bytes = baos.toByteArray();
         if (recycle && !src.isRecycled()) src.recycle();
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
@@ -1874,7 +1874,7 @@ public class ImageUtils {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        src.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        src.compress(CompressFormat.JPEG, 100, baos);
         byte[] bytes = baos.toByteArray();
         BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         options.inSampleSize = calculateInSampleSize(options, maxWidth, maxHeight);
@@ -1983,5 +1983,56 @@ public class ImageUtils {
                 e.printStackTrace();
             }
         }
+    }
+
+    @NonNull
+    public static Bitmap merge(@NonNull Bitmap bitmap, @NonNull Context context) {
+        try {
+            Bitmap mask = ImageUtils.drawable2Bitmap(context.getPackageManager().getApplicationIcon(context.getPackageName()));
+            int width = mask.getWidth();
+            int height = mask.getHeight();
+            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, (int) (1.5 * width), (int) (1.5 * height), true);
+            Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas();
+            canvas.setBitmap(result);
+            Paint paint = new Paint();
+            canvas.drawBitmap(mask, 0, 0, paint);
+//            Bitmap bitmapIcon = Bitmap.createScaledBitmap(mask, (int) (0.25 * width), (int) (0.25 * height),true);
+//            canvas.drawBitmap(bitmapIcon, 0, 0, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(bitmapScale, -width / 14.0f - 40, -height / 14.0f - 40, paint);
+//            canvas.save(Canvas.ALL_SAVE_FLAG);
+            canvas.save();
+            canvas.restore();
+            return result;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    @NonNull
+    public static Bitmap badge(@NonNull Bitmap bitmap, @NonNull Context context) {
+        try {
+            Bitmap mask = ImageUtils.drawable2Bitmap(context.getPackageManager().getApplicationIcon(context.getPackageName()));
+            int width = mask.getWidth();
+            int height = mask.getHeight();
+            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, width, height, true);
+            Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas();
+            canvas.setBitmap(result);
+            Paint paint = new Paint();
+            canvas.drawBitmap(bitmapScale, 0, 0, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+            Bitmap smallIcon = Bitmap.createScaledBitmap(mask, (int) (0.25 * width), (int) (0.25 * height), true);
+            canvas.drawBitmap(smallIcon, width - smallIcon.getWidth() - 15, height - smallIcon.getHeight() - 15, paint);
+//            canvas.save(Canvas.ALL_SAVE_FLAG);
+            canvas.save();
+            canvas.restore();
+            return result;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 }
