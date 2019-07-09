@@ -1992,7 +1992,8 @@ public class ImageUtils {
             Bitmap mask = ImageUtils.drawable2Bitmap(context.getPackageManager().getApplicationIcon(context.getPackageName()));
             int width = mask.getWidth();
             int height = mask.getHeight();
-            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, (int) (1.5 * width), (int) (1.5 * height), true);
+//            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, (int) (1.5 * width), (int) (1.5 * height), true);
+            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, width, height, true);
             Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas();
             canvas.setBitmap(result);
@@ -2001,7 +2002,8 @@ public class ImageUtils {
 //            Bitmap bitmapIcon = Bitmap.createScaledBitmap(mask, (int) (0.25 * width), (int) (0.25 * height),true);
 //            canvas.drawBitmap(bitmapIcon, 0, 0, paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmapScale, -width / 14.0f - 40, -height / 14.0f - 40, paint);
+//            canvas.drawBitmap(bitmapScale, -width / 14.0f - 40, -height / 14.0f - 40, paint);
+            canvas.drawBitmap(bitmapScale, 0, 0, paint);
 //            canvas.save(Canvas.ALL_SAVE_FLAG);
             canvas.save();
             canvas.restore();
