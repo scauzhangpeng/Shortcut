@@ -8,8 +8,8 @@ import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.v4.content.pm.ShortcutInfoCompat;
-import android.support.v4.graphics.drawable.IconCompat;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.graphics.drawable.IconCompat;
 
 import com.muugi.shortcut.core.Action;
 import com.muugi.shortcut.core.AutoCreateBroadcastReceiver;

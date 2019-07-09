@@ -4,7 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.v4.graphics.drawable.IconCompat;
+import androidx.core.graphics.drawable.IconCompat;
 
 /**
  * Created by ZP on 2019-06-16.
