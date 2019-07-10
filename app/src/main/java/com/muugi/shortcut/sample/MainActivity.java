@@ -85,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "onUpdated: " + result);
                             Toast.makeText(MainActivity.this.getApplicationContext(),"onUpdated", Toast.LENGTH_LONG).show();
                         })
+                        .onAutoCreate(result -> {
+                            Log.d(TAG, "onAutoCreate: " + result);
+                            Toast.makeText(MainActivity.this.getApplicationContext(),"onAutoCreate", Toast.LENGTH_LONG).show();
+                        })
+                        .onAsyncAutoCreate(result -> {
+                            Log.d(TAG, "onAsyncAutoCreate: " + result);
+                            Toast.makeText(MainActivity.this.getApplicationContext(),"onAsyncAutoCreate", Toast.LENGTH_LONG).show();
+                        })
                         .start();
 
 

@@ -43,6 +43,11 @@ public class ShortcutInfoExtend {
         return getShortcutInfoCompat().getId();
     }
 
+    @NonNull
+    public CharSequence getShortLabel() {
+        return getShortcutInfoCompat().getShortLabel();
+    }
+
     public boolean isIconShapeWithLauncher() {
         return iconShapeWithLauncher;
     }

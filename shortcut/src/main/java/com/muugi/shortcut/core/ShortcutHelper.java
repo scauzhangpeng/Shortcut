@@ -80,6 +80,47 @@ public class ShortcutHelper {
         return false;
     }
 
+    public interface ShortcutExistCallback {
+        void shortcutNotExist();
+
+        void shortcutExist();
+
+        void shortcutExistWithHW();
+    }
+
+    public static boolean isShortcutExit(@NonNull Context context, @NonNull String id, CharSequence label, ShortcutExistCallback callback) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            ShortcutManager mShortcutManager =
+                    context.getSystemService(ShortcutManager.class);
+            if (mShortcutManager == null) {
+                callback.shortcutNotExist();
+                return false;
+            }
+
+            boolean withSameName = false;
+            List<ShortcutInfo> pinnedShortcuts =
+                    mShortcutManager.getPinnedShortcuts();
+            for (ShortcutInfo pinnedShortcut : pinnedShortcuts) {
+                if (pinnedShortcut.getId().equals(id)) {
+                    callback.shortcutExist();
+                    return true;
+                }
+                if (label.equals(pinnedShortcut.getShortLabel())) {
+                    withSameName = true;
+                }
+            }
+            if (withSameName
+                    && Build.MANUFACTURER.toLowerCase().equals("huawei")
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
+                callback.shortcutExistWithHW();
+                return true;
+            }
+        }
+        callback.shortcutNotExist();
+        return false;
+    }
+
     public static boolean isRequestPinShortcutSupported(@NonNull Context context) {
        return ShortcutManagerCompat.isRequestPinShortcutSupported(context);
     }
