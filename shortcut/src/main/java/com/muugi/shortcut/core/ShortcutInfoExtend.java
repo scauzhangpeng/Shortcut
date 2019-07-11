@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.pm.ShortcutInfoCompat;
@@ -14,32 +15,41 @@ import androidx.core.graphics.drawable.IconCompat;
  */
 public class ShortcutInfoExtend {
 
-    private @Nullable Bitmap mIconBitmap;
-    private @Nullable Drawable mIconDrawable;
-    private @Nullable IconCompat mIconCompat;
-    private @NonNull ShortcutInfoCompat mShortcutInfoCompat;
+    @Nullable
+    private Bitmap mIconBitmap;
+    @Nullable
+    private Drawable mIconDrawable;
+    @Nullable
+    private IconCompat mIconCompat;
+    @NonNull
+    private ShortcutInfoCompat mShortcutInfoCompat;
 
     private boolean iconShapeWithLauncher = true;
     private boolean updateIfExist = true;
     private boolean autoCreateWithSameName = true;
 
-    public @Nullable Bitmap getIconBitmap() {
+    @Nullable
+    public Bitmap getIconBitmap() {
         return mIconBitmap;
     }
 
-    public @Nullable Drawable getIconDrawable() {
+    @Nullable
+    public Drawable getIconDrawable() {
         return mIconDrawable;
     }
 
-    public @Nullable IconCompat getIconCompat() {
+    @Nullable
+    public IconCompat getIconCompat() {
         return mIconCompat;
     }
 
-    public @NonNull ShortcutInfoCompat getShortcutInfoCompat() {
+    @NonNull
+    public ShortcutInfoCompat getShortcutInfoCompat() {
         return mShortcutInfoCompat;
     }
 
-    public @NonNull String getId() {
+    @NonNull
+    public String getId() {
         return getShortcutInfoCompat().getId();
     }
 
@@ -80,12 +90,12 @@ public class ShortcutInfoExtend {
         private boolean updateIfExist;
         private boolean autoCreateWithSameName;
         private Intent[] mIntents;
-        private boolean isAwaysBadge = false;
 
         public Builder(@NonNull Context context, @NonNull String id) {
             super(context, id);
         }
 
+        @NonNull
         public Builder setIcon(Bitmap val) {
             mIconBitmap = val;
             mIconDrawable = null;
@@ -93,6 +103,7 @@ public class ShortcutInfoExtend {
             return this;
         }
 
+        @NonNull
         public Builder setIcon(Drawable val) {
             mIconBitmap = null;
             mIconDrawable = val;
@@ -100,22 +111,19 @@ public class ShortcutInfoExtend {
             return this;
         }
 
-        @Override
-        public Builder setAlwaysBadged() {
-            isAwaysBadge = true;
-            return this;
-        }
-
+        @NonNull
         public Builder iconShapeWithLauncher(boolean val) {
             iconShapeWithLauncher = val;
             return this;
         }
 
+        @NonNull
         public Builder updateIfExist(boolean val) {
             updateIfExist = val;
             return this;
         }
 
+        @NonNull
         public Builder autoCreateWithSameName(boolean val) {
             autoCreateWithSameName = val;
             return this;
@@ -134,33 +142,25 @@ public class ShortcutInfoExtend {
             return this;
         }
 
+        @NonNull
         public ShortcutInfoExtend buildEx() {
             super.setIntents(mIntents);
-            if (isAwaysBadge()) {
-                super.setAlwaysBadged();
-            }
             mShortcutInfoCompat = super.build();
             return new ShortcutInfoExtend(this);
         }
 
+        @Nullable
         public Bitmap getIconBitmap() {
             return mIconBitmap;
         }
 
+        @Nullable
         public Drawable getIconDrawable() {
             return mIconDrawable;
         }
 
-        public IconCompat getIconCompat() {
-            return mIconCompat;
-        }
-
         public boolean isIconShapeWithLauncher() {
             return iconShapeWithLauncher;
-        }
-
-        public boolean isAwaysBadge() {
-            return isAwaysBadge;
         }
 
         @NonNull

@@ -8,6 +8,7 @@ import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+
 import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.graphics.drawable.IconCompat;
 
@@ -244,9 +245,6 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
             if (mBuilder.isIconShapeWithLauncher() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 bitmap = ImageUtils.merge(bitmap, mApplicationContext);
             }
-            if (mBuilder.isAwaysBadge() && Build.MANUFACTURER.toLowerCase().equals("xiaomi")) {
-                bitmap = ImageUtils.badge(bitmap, mApplicationContext);
-            }
             mBuilder.setIcon(IconCompat.createWithBitmap(bitmap));
 
         }
@@ -257,36 +255,36 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
                 shortcutInfoExtend.getId(),
                 shortcutInfoExtend.getShortLabel(),
                 new ShortcutHelper.ShortcutExistCallback() {
-            @Override
-            public void shortcutNotExist() {
-                IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(mApplicationContext, "com.shortcut.core.normal_create");
-                boolean requestPinShortcut = ShortcutHelper.requestPinShortcut(mApplicationContext, shortcutInfoCompat, defaultIntentSender);
-                if (mActionNormalCreate != null) {
-                    mActionNormalCreate.onAction(requestPinShortcut);
-                }
-            }
-
-            @Override
-            public void shortcutExist() {
-                if (shortcutInfoExtend.isUpdateIfExist()) {
-                    boolean updatePinShortcut = ShortcutHelper.updatePinShortcut(mApplicationContext, shortcutInfoCompat);
-                    if (mActionUpdate != null) {
-                        mActionUpdate.onAction(updatePinShortcut);
+                    @Override
+                    public void shortcutNotExist() {
+                        IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(mApplicationContext, "com.shortcut.core.normal_create");
+                        boolean requestPinShortcut = ShortcutHelper.requestPinShortcut(mApplicationContext, shortcutInfoCompat, defaultIntentSender);
+                        if (mActionNormalCreate != null) {
+                            mActionNormalCreate.onAction(requestPinShortcut);
+                        }
                     }
-                }
-            }
 
-            @Override
-            public void shortcutExistWithHW() {
-                originShortLabel = shortcutInfoExtend.getShortLabel();
-                mBuilder.setShortLabel(originShortLabel + UUID.randomUUID().toString());
-                IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(mApplicationContext, "com.shortcut.core.auto_create");
-                boolean requestPinShortcut = ShortcutHelper.requestPinShortcut(mApplicationContext, mBuilder.buildEx().getShortcutInfoCompat(), defaultIntentSender);
-                if (mActionAutoCreate != null) {
-                    mActionAutoCreate.onAction(requestPinShortcut);
-                }
-            }
-        });
+                    @Override
+                    public void shortcutExist() {
+                        if (shortcutInfoExtend.isUpdateIfExist()) {
+                            boolean updatePinShortcut = ShortcutHelper.updatePinShortcut(mApplicationContext, shortcutInfoCompat);
+                            if (mActionUpdate != null) {
+                                mActionUpdate.onAction(updatePinShortcut);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void shortcutExistWithHW() {
+                        originShortLabel = shortcutInfoExtend.getShortLabel();
+                        mBuilder.setShortLabel(originShortLabel + UUID.randomUUID().toString());
+                        IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(mApplicationContext, "com.shortcut.core.auto_create");
+                        boolean requestPinShortcut = ShortcutHelper.requestPinShortcut(mApplicationContext, mBuilder.buildEx().getShortcutInfoCompat(), defaultIntentSender);
+                        if (mActionAutoCreate != null) {
+                            mActionAutoCreate.onAction(requestPinShortcut);
+                        }
+                    }
+                });
     }
 
     @Override

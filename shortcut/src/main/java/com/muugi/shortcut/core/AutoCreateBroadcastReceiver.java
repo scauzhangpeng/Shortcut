@@ -18,7 +18,7 @@ public class AutoCreateBroadcastReceiver extends BroadcastReceiver {
         void onReceive(Context context, Intent intent);
     }
 
-    public  void setOnAutoCreateListener(OnAutoCreateListener listener) {
+    public void setOnAutoCreateListener(OnAutoCreateListener listener) {
         this.mOnAutoCreateListener = listener;
     }
 

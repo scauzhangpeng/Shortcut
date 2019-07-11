@@ -88,7 +88,7 @@ public class RuntimeSettingPage {
 
     private static Intent xiaomiApi(Context context) {
         String version = getSystemProperty(MIUI_VERSION_NAME);
-        if(TextUtils.isEmpty(version) || version.contains("7") || version.contains("8")) {
+        if (TextUtils.isEmpty(version) || version.contains("7") || version.contains("8")) {
             Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
             intent.putExtra("extra_pkgname", context.getPackageName());
             return intent;
@@ -108,7 +108,7 @@ public class RuntimeSettingPage {
         Intent intent = new Intent();
         intent.putExtra("packagename", context.getPackageName());
         intent.setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.SoftPermissionDetailActivity"));
-        if(hasActivity(context, intent)) return intent;
+        if (hasActivity(context, intent)) return intent;
 
         intent.setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.safeguard.SoftPermissionDetailActivity"));
         return intent;

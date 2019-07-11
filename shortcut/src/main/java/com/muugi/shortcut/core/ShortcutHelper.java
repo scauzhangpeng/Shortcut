@@ -5,6 +5,7 @@ import android.content.IntentSender;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
 import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.pm.ShortcutInfoCompat;
@@ -122,7 +123,7 @@ public class ShortcutHelper {
     }
 
     public static boolean isRequestPinShortcutSupported(@NonNull Context context) {
-       return ShortcutManagerCompat.isRequestPinShortcutSupported(context);
+        return ShortcutManagerCompat.isRequestPinShortcutSupported(context);
     }
 
     public static void toPermissionSetting(Context context) {

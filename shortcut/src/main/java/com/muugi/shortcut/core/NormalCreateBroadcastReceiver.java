@@ -18,7 +18,7 @@ public class NormalCreateBroadcastReceiver extends BroadcastReceiver {
         void onReceive(Context context, Intent intent);
     }
 
-    public  void setOnNormalCreateListener(OnNormalCreateListener listener) {
+    public void setOnNormalCreateListener(OnNormalCreateListener listener) {
         this.mOnNormalCreateListener = listener;
     }
 
