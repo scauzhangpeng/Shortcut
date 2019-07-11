@@ -61,10 +61,7 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     mBuilder.setShortLabel(originShortLabel);
-                    boolean updatePinShortcut = ShortcutHelper.updatePinShortcut(context, mBuilder.buildEx().getShortcutInfoCompat());
-                    if (mActionAsyncAutoCreate != null) {
-                        mActionAsyncAutoCreate.onAction(updatePinShortcut);
-                    }
+                    updateShortcut(mBuilder.buildEx().getShortcutInfoCompat(), context, mActionAsyncAutoCreate);
                     originShortLabel = null;
                 }
             });
@@ -257,34 +254,44 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
                 new ShortcutHelper.ShortcutExistCallback() {
                     @Override
                     public void shortcutNotExist() {
-                        IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(mApplicationContext, "com.shortcut.core.normal_create");
-                        boolean requestPinShortcut = ShortcutHelper.requestPinShortcut(mApplicationContext, shortcutInfoCompat, defaultIntentSender);
-                        if (mActionNormalCreate != null) {
-                            mActionNormalCreate.onAction(requestPinShortcut);
-                        }
+                        createShortcut(shortcutInfoCompat, "com.shortcut.core.normal_create", mActionNormalCreate);
                     }
 
                     @Override
                     public void shortcutExist() {
                         if (shortcutInfoExtend.isUpdateIfExist()) {
-                            boolean updatePinShortcut = ShortcutHelper.updatePinShortcut(mApplicationContext, shortcutInfoCompat);
-                            if (mActionUpdate != null) {
-                                mActionUpdate.onAction(updatePinShortcut);
-                            }
+                            updateShortcut(shortcutInfoCompat, mApplicationContext, mActionUpdate);
+                        } else {
+                            createShortcut(shortcutInfoCompat, "com.shortcut.core.normal_create", mActionNormalCreate);
                         }
                     }
 
                     @Override
                     public void shortcutExistWithHW() {
-                        originShortLabel = shortcutInfoExtend.getShortLabel();
-                        mBuilder.setShortLabel(originShortLabel + UUID.randomUUID().toString());
-                        IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(mApplicationContext, "com.shortcut.core.auto_create");
-                        boolean requestPinShortcut = ShortcutHelper.requestPinShortcut(mApplicationContext, mBuilder.buildEx().getShortcutInfoCompat(), defaultIntentSender);
-                        if (mActionAutoCreate != null) {
-                            mActionAutoCreate.onAction(requestPinShortcut);
+                        if (shortcutInfoExtend.isAutoCreateWithSameName()) {
+                            originShortLabel = shortcutInfoExtend.getShortLabel();
+                            mBuilder.setShortLabel(originShortLabel + UUID.randomUUID().toString());
+                            createShortcut(mBuilder.buildEx().getShortcutInfoCompat(), "com.shortcut.core.auto_create", mActionAutoCreate);
+                        } else {
+                            createShortcut(shortcutInfoCompat, "com.shortcut.core.normal_create", mActionNormalCreate);
                         }
                     }
                 });
+    }
+
+    private void updateShortcut(ShortcutInfoCompat shortcutInfoCompat, Context applicationContext, Action<Boolean> actionUpdate) {
+        boolean updatePinShortcut = ShortcutHelper.updatePinShortcut(applicationContext, shortcutInfoCompat);
+        if (actionUpdate != null) {
+            actionUpdate.onAction(updatePinShortcut);
+        }
+    }
+
+    private void createShortcut(ShortcutInfoCompat shortcutInfoCompat, String s, Action<Boolean> actionNormalCreate) {
+        IntentSender defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(mApplicationContext, s);
+        boolean requestPinShortcut = ShortcutHelper.requestPinShortcut(mApplicationContext, shortcutInfoCompat, defaultIntentSender);
+        if (actionNormalCreate != null) {
+            actionNormalCreate.onAction(requestPinShortcut);
+        }
     }
 
     @Override

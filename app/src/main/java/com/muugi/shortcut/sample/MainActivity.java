@@ -30,18 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private ContactAdapter mContactAdapter;
     private List<Group> mContacts;
 
-    private MultipleTypeSupport<Group> mMultipleTypeSupport = new MultipleTypeSupport<Group>() {
-        @Override
-        public int getLayoutId(List<Group> list, Group group, int position) {
-            if (group.getPosition() != -1) {
-                return R.layout.item_title;
-            }
-            return R.layout.item_contact;
+    private MultipleTypeSupport<Group> mMultipleTypeSupport = (list, group, position) -> {
+        if (group.getPosition() != -1) {
+            return R.layout.item_title;
         }
+        return R.layout.item_contact;
     };
-
-    private static final String ACTION = "com.muugi.shortcut";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initRvContact() {
         mContacts = MockData.loadFriendList();
-        mContactAdapter = new ContactAdapter(mContacts,this, mMultipleTypeSupport);
+        mContactAdapter = new ContactAdapter(mContacts, this, mMultipleTypeSupport);
         mRvContact = findViewById(R.id.rv_contact);
         mRvContact.setAdapter(mContactAdapter);
         mRvContact.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -75,23 +69,23 @@ public class MainActivity extends AppCompatActivity {
                         .setIntent(MainActivity.class)
                         .onCreated(result -> {
                             Log.d(TAG, "onCreated: " + result);
-                            Toast.makeText(MainActivity.this.getApplicationContext(),"onCreated", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this.getApplicationContext(), "快捷方式创建：" + (result ? "成功" : "失败"), Toast.LENGTH_SHORT).show();
                         })
                         .onAsyncCreate(result -> {
                             Log.d(TAG, "onAsyncCreate: " + result);
-                            Toast.makeText(MainActivity.this.getApplicationContext(),"onAsyncCreate", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this.getApplicationContext(), "快捷方式创建异步广播回调：" + (result ? "成功" : "失败"), Toast.LENGTH_SHORT).show();
                         })
                         .onUpdated(result -> {
                             Log.d(TAG, "onUpdated: " + result);
-                            Toast.makeText(MainActivity.this.getApplicationContext(),"onUpdated", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this.getApplicationContext(), "快捷方式更新：" + (result ? "成功" : "失败"), Toast.LENGTH_SHORT).show();
                         })
                         .onAutoCreate(result -> {
                             Log.d(TAG, "onAutoCreate: " + result);
-                            Toast.makeText(MainActivity.this.getApplicationContext(),"onAutoCreate", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this.getApplicationContext(), "快捷方式创建(先创建后自动更新)：" + (result ? "成功" : "失败"), Toast.LENGTH_SHORT).show();
                         })
                         .onAsyncAutoCreate(result -> {
                             Log.d(TAG, "onAsyncAutoCreate: " + result);
-                            Toast.makeText(MainActivity.this.getApplicationContext(),"onAsyncAutoCreate", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this.getApplicationContext(), "快捷方式创建(先创建后自动更新)异步广播回调：" + (result ? "成功" : "失败"), Toast.LENGTH_SHORT).show();
                         })
                         .start();
 
@@ -102,14 +96,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
 
-        findViewById(R.id.btn_to_permission_v1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        findViewById(R.id.btn_to_permission_v1).setOnClickListener(v ->
                 Shortcut.get()
                         .setting(MainActivity.this)
-                        .start();
-            }
-        });
+                        .start());
     }
 
     @Override
@@ -118,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         fixInputMethodManagerLeak(this);
         Shortcut.get().release();
     }
+
     public static void fixInputMethodManagerLeak(Context destContext) {
         if (destContext == null) {
             return;
