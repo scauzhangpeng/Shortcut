@@ -14,6 +14,7 @@ import androidx.core.graphics.drawable.IconCompat;
 
 import com.muugi.shortcut.core.Action;
 import com.muugi.shortcut.core.AutoCreateBroadcastReceiver;
+import com.muugi.shortcut.core.ShortcutOption;
 import com.muugi.shortcut.pin.BaseRequest;
 import com.muugi.shortcut.utils.ImageUtils;
 import com.muugi.shortcut.core.IntentSenderHelper;
@@ -31,7 +32,7 @@ import java.util.UUID;
 /**
  * Created by ZP on 2019-06-16.
  */
-public class Shortcut implements PinOption, InfoRequest, IntentRequest {
+public class Shortcut implements ShortcutOption, PinOption, InfoRequest, IntentRequest {
 
 
     private static volatile Shortcut INSTANCE;
@@ -94,7 +95,7 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
         return context;
     }
 
-    public static Shortcut get() {
+    public static ShortcutOption get() {
         if (INSTANCE == null) {
             synchronized (Shortcut.class) {
                 if (INSTANCE == null) {
@@ -105,6 +106,7 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
         return INSTANCE;
     }
 
+    @Override
     public void release() {
 
         mActionNormalCreate = null;
@@ -126,6 +128,7 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
         }
     }
 
+    @Override
     public PinOption pin(Context context) {
         registerCallback(context);
         return this;

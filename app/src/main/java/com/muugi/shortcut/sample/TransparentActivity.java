@@ -24,7 +24,7 @@ public class TransparentActivity extends Activity {
         if (intent != null) {
             boolean isShortcut = intent.getBooleanExtra("isShortcut", false);
             String name = intent.getStringExtra("name");
-            String uid = intent.getStringExtra("uid");
+            String uid = intent.getStringExtra("id");
             Log.d(TAG, "onCreate: isShortcut = " + isShortcut + "，name = " + name + "，uid = " + uid);
         }
         if (!isMainTaskEmpty() || isLogined()) {
