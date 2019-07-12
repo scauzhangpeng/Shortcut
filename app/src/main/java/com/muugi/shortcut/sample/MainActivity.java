@@ -64,9 +64,12 @@ public class MainActivity extends AppCompatActivity {
                         .setLongLabel(contact.getNickname())
                         .setDisabledMessage(contact.getNickname())
                         .updateIfExist(true)
-                        .createWithSameName(true)
+                        .fixHUAWEIOreo(true)
                         .iconShapeWithLauncher(true)
-                        .setIntent(MainActivity.class)
+                        .setIntent(TransparentActivity.class)
+                        .putExtra("name", contact.getNickname())
+                        .putExtra("id", contact.getUid())
+                        .putExtra("isShortcut", true)
                         .onCreated(result -> {
                             Log.d(TAG, "onCreated: " + result);
                             Toast.makeText(MainActivity.this.getApplicationContext(), "快捷方式创建：" + (result ? "成功" : "失败"), Toast.LENGTH_SHORT).show();

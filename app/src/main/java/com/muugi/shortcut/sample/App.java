@@ -9,6 +9,8 @@ import com.squareup.leakcanary.LeakCanary;
  */
 public class App extends Application {
 
+    public static boolean isLogined = false;
+
     @Override
     public void onCreate() {
         super.onCreate();

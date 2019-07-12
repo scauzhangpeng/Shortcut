@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 
@@ -88,14 +86,6 @@ public class ContactAdapter extends BasicAdapter<Group> {
                                 .into(view);
                         break;
                 }
-            }
-        });
-
-        CheckBox checkBox = holder.getView(R.id.cb_badged);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                contact.setShowBadged(isChecked);
             }
         });
 

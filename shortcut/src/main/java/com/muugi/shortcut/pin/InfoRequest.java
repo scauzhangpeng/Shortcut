@@ -35,7 +35,7 @@ public interface InfoRequest extends BaseRequest {
 
     InfoRequest updateIfExist(boolean updateIfExist);
 
-    InfoRequest createWithSameName(boolean isAutoCreate);
+    InfoRequest fixHUAWEIOreo(boolean isAutoCreate);
 
     InfoRequest iconShapeWithLauncher(boolean isIconAutoShape);
 

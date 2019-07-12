@@ -80,10 +80,4 @@
 
     </RadioGroup>
 
-    <CheckBox
-        android:id="@+id/cb_badged"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="显示Badged"/>
-
 </LinearLayout>

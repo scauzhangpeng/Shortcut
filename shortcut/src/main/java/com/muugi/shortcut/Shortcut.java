@@ -220,7 +220,7 @@ public class Shortcut implements PinOption, InfoRequest, IntentRequest {
     }
 
     @Override
-    public InfoRequest createWithSameName(boolean isAutoCreate) {
+    public InfoRequest fixHUAWEIOreo(boolean isAutoCreate) {
         mBuilder.autoCreateWithSameName(isAutoCreate);
         return this;
     }
