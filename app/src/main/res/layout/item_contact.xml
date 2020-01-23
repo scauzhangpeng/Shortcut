@@ -4,80 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
-    android:orientation="vertical">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:orientation="horizontal">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/iv_photo"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            tools:src="@mipmap/ic_launcher"
-            android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true"/>
+    <ImageView
+        android:id="@+id/iv_photo"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        tools:src="@mipmap/ic_launcher"
+        android:layout_marginLeft="10dp" />
 
-        <TextView
-            android:id="@+id/tv_nick_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="河婆墟邓紫棋"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/iv_photo"
-            android:layout_centerVertical="true"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/tv_uid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/tv_nick_name"/>
-
-        <Button
-            android:id="@+id/btn_create"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
-            style="?android:attr/borderlessButtonStyle"
-            android:background="@color/colorPrimary"
-            android:textColor="@android:color/white"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:text="创建"/>
-    </RelativeLayout>
-
-
-
-    <RadioGroup
-        android:id="@+id/rg_icon_type"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_nick_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <RadioButton
-            android:id="@+id/rbtn_square"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:checked="true"
-            android:text="正方形"/>
+        tools:text="河婆墟邓紫棋"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:textSize="16sp"/>
 
-        <RadioButton
-            android:id="@+id/rbtn_circle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="圆形"/>
-
-        <RadioButton
-            android:id="@+id/rbtn_cornor"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="圆角"/>
-
-    </RadioGroup>
+    <TextView
+        android:id="@+id/tv_uid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp" />
 
 </LinearLayout>

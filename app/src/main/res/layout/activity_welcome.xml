@@ -3,10 +3,78 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/open"
+    <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:textSize="18sp"
+            android:textColor="#2a2a2a"
+            android:text="创建桌面快捷方式权限"/>
+
+        <TextView
+            android:id="@+id/tv_shortcut_permission_state"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:drawableRight="@drawable/contacts_next"
+            android:drawablePadding="8dp"
+            android:paddingRight="20dp"
+            android:textSize="15sp"
+            android:textColor="#FFD5D5D5"
+            android:text="未知"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_height="1dp"
+        android:background="#EDEDED"/>
+
+    <LinearLayout
+        android:onClick="goToPreview"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:textSize="18sp"
+            android:textColor="#2a2a2a"
+            android:text="预览桌面快捷方式"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:drawableRight="@drawable/contacts_next"
+            android:drawablePadding="8dp"
+            android:paddingRight="20dp"
+            android:textSize="15sp"
+            android:textColor="#FFD5D5D5"
+            android:text="预览"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
+        android:onClick="goToCreateShortcut"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="openMain"/>
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:text="创建快捷方式>>>"/>
 
 </LinearLayout>

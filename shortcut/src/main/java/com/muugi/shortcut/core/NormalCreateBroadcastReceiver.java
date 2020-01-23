@@ -3,7 +3,8 @@ package com.muugi.shortcut.core;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+
+import com.muugi.shortcut.utils.Logger;
 
 /**
  * Created by ZP on 2019-07-08.
@@ -12,25 +13,18 @@ public class NormalCreateBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "NormalCreateBroadcastRe";
 
-    private OnNormalCreateListener mOnNormalCreateListener;
-
-    public interface OnNormalCreateListener {
-        void onReceive(Context context, Intent intent);
-    }
-
-    public void setOnNormalCreateListener(OnNormalCreateListener listener) {
-        this.mOnNormalCreateListener = listener;
-    }
+    public static final String ACTION = "com.shortcut.core.normal_create";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(TAG, "onReceive: " + action);
-        if ("com.shortcut.core.normal_create".equals(action)) {
-            Log.d(TAG, "onReceive: auto create, listener = " + (mOnNormalCreateListener != null));
-            if (mOnNormalCreateListener != null) {
-                mOnNormalCreateListener.onReceive(context, intent);
-            }
+        Logger.get().log(TAG, "onReceive: " + action);
+        if (ACTION.equals(action)) {
+            String id = intent.getStringExtra("id");
+            String label = intent.getStringExtra("label");
+            Logger.get().log(TAG,  "Shortcut normal create callback," +
+                    " id = " + id + ",label = " + label);
+            ShortcutV2.get().notifyAsyncCreate(id, id, label);
         }
     }
 }

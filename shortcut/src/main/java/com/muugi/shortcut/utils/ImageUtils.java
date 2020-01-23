@@ -1,7 +1,11 @@
 package com.muugi.shortcut.utils;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -48,6 +52,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * Created by ZP on 2019/3/5.
@@ -1992,6 +1997,41 @@ public class ImageUtils {
             Bitmap mask = ImageUtils.drawable2Bitmap(context.getPackageManager().getApplicationIcon(context.getPackageName()));
             int width = mask.getWidth();
             int height = mask.getHeight();
+            int index = 0;
+            for (int i = 0; i < height; i++) {
+                int pixel = mask.getPixel(width / 2, i);
+                if (pixel != 0) {
+                    index = i;
+                    break;
+                }
+            }
+            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, (width - index * 2), (height - index * 2) , true);
+            Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas();
+            canvas.setBitmap(result);
+            Paint paint = new Paint();
+            canvas.drawBitmap(mask, 0, 0, paint);
+//            Bitmap bitmapIcon = Bitmap.createScaledBitmap(mask, (int) (0.25 * width), (int) (0.25 * height),true);
+//            canvas.drawBitmap(bitmapIcon, 0, 0, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+//            canvas.drawBitmap(bitmapScale, -width / 14.0f - 40, -height / 14.0f - 40, paint);
+            canvas.drawBitmap(bitmapScale, index, index, paint);
+//            canvas.save(Canvas.ALL_SAVE_FLAG);
+            canvas.save();
+            canvas.restore();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    @NonNull
+    public static Bitmap merge1(@NonNull Bitmap bitmap, @NonNull Context context) {
+        try {
+            Bitmap mask = ImageUtils.drawable2Bitmap(loadAppsInfo(context, context.getPackageManager()));
+            int width = mask.getWidth();
+            int height = mask.getHeight();
 //            Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, (int) (1.5 * width), (int) (1.5 * height), true);
             Bitmap bitmapScale = Bitmap.createScaledBitmap(bitmap, width, height, true);
             Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -2008,10 +2048,61 @@ public class ImageUtils {
             canvas.save();
             canvas.restore();
             return result;
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return bitmap;
+    }
+
+
+    public static Drawable loadAppsInfo(Context context, PackageManager packageManager) {
+        List<ResolveInfo> apps = null;
+        Intent filterIntent = new Intent(Intent.ACTION_MAIN, null);
+        //Intent.CATEGORY_LAUNCHER主要的过滤条件
+        filterIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        apps = packageManager.queryIntentActivities(filterIntent, 0);
+        for (ResolveInfo resolveInfo : apps){
+            if (context.getPackageName().equals(resolveInfo.activityInfo.applicationInfo.packageName)) {
+                return getResIconFormActyInfo(context, resolveInfo.activityInfo, packageManager);
+            }
+        }
+        return null;
+    }
+
+    private static Drawable getResIconFormActyInfo(Context context, ActivityInfo info, PackageManager packageManager) {
+        Resources resources;
+        try {
+            resources = packageManager.getResourcesForApplication(
+                    info.applicationInfo);
+        } catch (PackageManager.NameNotFoundException e) {
+            resources = null;
+        }
+        if (resources != null) {
+            int iconId = info.getIconResource();
+            if (iconId != 0) {
+                return getResIconFormActivityInfo(context, resources, iconId);
+            }
+        }
+        return getDefaultIcon(context);
+    }
+
+
+    private static Drawable getResIconFormActivityInfo(Context context, Resources resources, int iconId) {
+        ActivityManager activityManager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        Drawable drawable;
+        try {
+            drawable = resources.getDrawableForDensity(iconId, activityManager.getLauncherLargeIconDensity());
+        } catch (Resources.NotFoundException e) {
+            drawable = null;
+        }
+        return (drawable != null) ? drawable : getDefaultIcon(context);
+    }
+
+    //获取一个默认的图标，避免为空的情况
+    private static Drawable getDefaultIcon(Context context) {
+        return getResIconFormActivityInfo(context, Resources.getSystem(),
+                android.R.mipmap.sym_def_app_icon);
     }
 
     @NonNull

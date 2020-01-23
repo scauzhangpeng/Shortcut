@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 
 import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutInfoCompatV2;
 import androidx.core.graphics.drawable.IconCompat;
 
 import com.muugi.shortcut.core.Action;
@@ -20,7 +21,6 @@ import com.muugi.shortcut.utils.ImageUtils;
 import com.muugi.shortcut.core.IntentSenderHelper;
 import com.muugi.shortcut.core.NormalCreateBroadcastReceiver;
 import com.muugi.shortcut.core.ShortcutHelper;
-import com.muugi.shortcut.core.ShortcutInfoExtend;
 import com.muugi.shortcut.pin.InfoRequest;
 import com.muugi.shortcut.pin.IntentRequest;
 import com.muugi.shortcut.pin.PinOption;
@@ -46,7 +46,7 @@ public class Shortcut implements ShortcutOption, PinOption, InfoRequest, IntentR
     private AutoCreateBroadcastReceiver mAutoCreateBroadcastReceiver;
     private NormalCreateBroadcastReceiver mNormalCreateBroadcastReceiver;
 
-    private ShortcutInfoExtend.Builder mBuilder;
+    private ShortcutInfoCompatV2.Builder mBuilder;
     private Context mApplicationContext;
     private CharSequence originShortLabel;
 
@@ -58,27 +58,27 @@ public class Shortcut implements ShortcutOption, PinOption, InfoRequest, IntentR
         mApplicationContext = checkNotNull(context);
         if (mAutoCreateBroadcastReceiver == null) {
             mAutoCreateBroadcastReceiver = new AutoCreateBroadcastReceiver();
-            mAutoCreateBroadcastReceiver.setOnAutoCreateListener(new AutoCreateBroadcastReceiver.OnAutoCreateListener() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    mBuilder.setShortLabel(originShortLabel);
-                    updateShortcut(mBuilder.buildEx().getShortcutInfoCompat(), context, mActionAsyncAutoCreate);
-                    originShortLabel = null;
-                }
-            });
+//            mAutoCreateBroadcastReceiver.setOnAutoCreateListener(new AutoCreateBroadcastReceiver.OnAutoCreateListener() {
+//                @Override
+//                public void onReceive(Context context, Intent intent) {
+//                    mBuilder.setShortLabel(originShortLabel);
+//                    updateShortcut(mBuilder.build(), context, mActionAsyncAutoCreate);
+//                    originShortLabel = null;
+//                }
+//            });
             mApplicationContext.registerReceiver(mAutoCreateBroadcastReceiver, new IntentFilter("com.shortcut.core.auto_create"));
         }
 
         if (mNormalCreateBroadcastReceiver == null) {
             mNormalCreateBroadcastReceiver = new NormalCreateBroadcastReceiver();
-            mNormalCreateBroadcastReceiver.setOnNormalCreateListener(new NormalCreateBroadcastReceiver.OnNormalCreateListener() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    if (mActionAsyncNormalCreate != null) {
-                        mActionAsyncNormalCreate.onAction(true);
-                    }
-                }
-            });
+//            mNormalCreateBroadcastReceiver.setOnNormalCreateListener(new NormalCreateBroadcastReceiver.OnNormalCreateListener() {
+//                @Override
+//                public void onReceive(Context context, Intent intent) {
+//                    if (mActionAsyncNormalCreate != null) {
+//                        mActionAsyncNormalCreate.onAction(true);
+//                    }
+//                }
+//            });
             mApplicationContext.registerReceiver(mNormalCreateBroadcastReceiver, new IntentFilter("com.shortcut.core.normal_create"));
         }
     }
@@ -116,13 +116,13 @@ public class Shortcut implements ShortcutOption, PinOption, InfoRequest, IntentR
         mActionAsyncNormalCreate = null;
 
         if (mAutoCreateBroadcastReceiver != null) {
-            mAutoCreateBroadcastReceiver.setOnAutoCreateListener(null);
+//            mAutoCreateBroadcastReceiver.setOnAutoCreateListener(null);
             mApplicationContext.unregisterReceiver(mAutoCreateBroadcastReceiver);
             mAutoCreateBroadcastReceiver = null;
         }
 
         if (mNormalCreateBroadcastReceiver != null) {
-            mNormalCreateBroadcastReceiver.setOnNormalCreateListener(null);
+//            mNormalCreateBroadcastReceiver.setOnNormalCreateListener(null);
             mApplicationContext.unregisterReceiver(mNormalCreateBroadcastReceiver);
             mNormalCreateBroadcastReceiver = null;
         }
@@ -141,7 +141,7 @@ public class Shortcut implements ShortcutOption, PinOption, InfoRequest, IntentR
 
     @Override
     public InfoRequest info(String uid) {
-        mBuilder = new ShortcutInfoExtend.Builder(mApplicationContext, uid);
+        mBuilder = new ShortcutInfoCompatV2.Builder(mApplicationContext, uid);
         return this;
     }
 
@@ -245,27 +245,26 @@ public class Shortcut implements ShortcutOption, PinOption, InfoRequest, IntentR
             if (mBuilder.isIconShapeWithLauncher() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 bitmap = ImageUtils.merge(bitmap, mApplicationContext);
             }
-            mBuilder.setIcon(IconCompat.createWithBitmap(bitmap));
+            mBuilder.setIcon(IconCompat.createWithAdaptiveBitmap(bitmap));
 
         }
 
-        final ShortcutInfoExtend shortcutInfoExtend = mBuilder.buildEx();
-        final ShortcutInfoCompat shortcutInfoCompat = shortcutInfoExtend.getShortcutInfoCompat();
+        final ShortcutInfoCompatV2 shortcutInfoExtend = mBuilder.build();
         ShortcutHelper.isShortcutExit(mApplicationContext,
                 shortcutInfoExtend.getId(),
                 shortcutInfoExtend.getShortLabel(),
                 new ShortcutHelper.ShortcutExistCallback() {
                     @Override
                     public void shortcutNotExist() {
-                        createShortcut(shortcutInfoCompat, "com.shortcut.core.normal_create", mActionNormalCreate);
+                        createShortcut(shortcutInfoExtend, "com.shortcut.core.normal_create", mActionNormalCreate);
                     }
 
                     @Override
                     public void shortcutExist() {
                         if (shortcutInfoExtend.isUpdateIfExist()) {
-                            updateShortcut(shortcutInfoCompat, mApplicationContext, mActionUpdate);
+                            updateShortcut(shortcutInfoExtend, mApplicationContext, mActionUpdate);
                         } else {
-                            createShortcut(shortcutInfoCompat, "com.shortcut.core.normal_create", mActionNormalCreate);
+                            createShortcut(shortcutInfoExtend, "com.shortcut.core.normal_create", mActionNormalCreate);
                         }
                     }
 
@@ -274,9 +273,9 @@ public class Shortcut implements ShortcutOption, PinOption, InfoRequest, IntentR
                         if (shortcutInfoExtend.isAutoCreateWithSameName()) {
                             originShortLabel = shortcutInfoExtend.getShortLabel();
                             mBuilder.setShortLabel(originShortLabel + UUID.randomUUID().toString());
-                            createShortcut(mBuilder.buildEx().getShortcutInfoCompat(), "com.shortcut.core.auto_create", mActionAutoCreate);
+                            createShortcut(mBuilder.build(), "com.shortcut.core.auto_create", mActionAutoCreate);
                         } else {
-                            createShortcut(shortcutInfoCompat, "com.shortcut.core.normal_create", mActionNormalCreate);
+                            createShortcut(shortcutInfoExtend, "com.shortcut.core.normal_create", mActionNormalCreate);
                         }
                     }
                 });

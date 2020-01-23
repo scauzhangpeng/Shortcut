@@ -61,7 +61,7 @@ public abstract class BasicAdapter<T> extends RecyclerView.Adapter<BasicViewHold
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickListener.onItemClick(holder.itemView, position);
+                    mOnItemClickListener.onItemClick(holder.itemView, position, mDatas.get(position));
                 }
             });
         }
@@ -88,7 +88,7 @@ public abstract class BasicAdapter<T> extends RecyclerView.Adapter<BasicViewHold
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickListener.onItemClick(holder.itemView, position);
+                    mOnItemClickListener.onItemClick(holder.itemView, position, mDatas.get(position));
                 }
             });
         }
@@ -115,8 +115,8 @@ public abstract class BasicAdapter<T> extends RecyclerView.Adapter<BasicViewHold
         return mDatas.size();
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
+    public interface OnItemClickListener<T> {
+        void onItemClick(View view, int position, T t);
     }
 
     public interface OnItemLongClickListener {

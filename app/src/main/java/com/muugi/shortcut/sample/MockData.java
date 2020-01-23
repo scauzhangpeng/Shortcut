@@ -14,17 +14,14 @@ public class MockData {
     static String defaultUrl = "";
 
     public static List<Group> loadFriendList() {
-        Group[] data = new Group[] {
-                new Group(0, "自定义图标"),
-                new Group(new Contact("1001", "", R.drawable.pig,"迷晴丶Chole")),
+        Group[] data = new Group[]{
+                new Group(0, "唯一性，名称相同"),
+                new Group(new Contact("1002", "", R.drawable.annie, "annie")),
+                new Group(new Contact("1003", "", R.drawable.braum, "annie")),
 
-                new Group(2, "唯一性，名称相同"),
-                new Group(new Contact("1002", "", R.drawable.pig,"小菜🐷")),
-                new Group(new Contact("1003", "", R.drawable.pig,"小菜🐷")),
-
-                new Group(5, "唯一性，uid相同"),
-                new Group(new Contact("1004", "", R.drawable.pig,"习斯特")),
-                new Group(new Contact("1004", "", R.drawable.pig,"普菈德")),
+                new Group(4, "唯一性，uid相同"),
+                new Group(new Contact("1004", "", R.drawable.kayle, "kayle")),
+                new Group(new Contact("1004", "", R.drawable.nunu, "nunu")),
         };
         return Arrays.asList(data);
     }

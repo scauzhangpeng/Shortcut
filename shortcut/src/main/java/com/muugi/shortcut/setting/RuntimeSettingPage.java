@@ -88,19 +88,31 @@ public class RuntimeSettingPage {
 
     private static Intent xiaomiApi(Context context) {
         String version = getSystemProperty(MIUI_VERSION_NAME);
-        if (TextUtils.isEmpty(version) || version.contains("7") || version.contains("8")) {
-            Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
-            intent.putExtra("extra_pkgname", context.getPackageName());
-            return intent;
+        if (TextUtils.isEmpty(version)) {
+            return defaultApi(context);
+        }
+        int versionI;
+        try {
+            versionI = Integer.parseInt(version.substring(1));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return defaultApi(context);
         }
         //xiaomi note2 MIUI 9.5进行适配，需要跳转至小米自带的权限软件
         //xiaomi note2 MUUI 10.0进行适配，需要跳转至小米自带的权限软件
-        if (TextUtils.isEmpty(version) || version.contains("9") || version.contains("10")) {
+        if (versionI >= 9) {
             Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
             intent.setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity"));
             intent.putExtra("extra_pkgname", context.getPackageName());
             return intent;
         }
+
+        if (versionI >= 7) {
+            Intent intent = new Intent("miui.intent.action.APP_PERM_EDITOR");
+            intent.putExtra("extra_pkgname", context.getPackageName());
+            return intent;
+        }
+
         return defaultApi(context);
     }
 
