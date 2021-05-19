@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.bumptech.glide.Glide;
 import com.muugi.shortcut.utils.ImageUtils;
@@ -32,7 +33,7 @@ public class PreviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
         initView();
-        showGetApplicationIcon(getResources().getDrawable(R.drawable.annie), new Callback() {
+        showGetApplicationIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.annie, getTheme()), new Callback() {
             @Override
             public void showAppIcon(Bitmap bitmap) {
                 Glide.with(PreviewActivity.this).asBitmap().load(bitmap).into(mIvAppIcon1);
@@ -49,7 +50,7 @@ public class PreviewActivity extends AppCompatActivity {
             }
         });
 
-        showLoadIconFromAppList(getResources().getDrawable(R.drawable.annie), new Callback() {
+        showLoadIconFromAppList(ResourcesCompat.getDrawable(getResources(), R.drawable.annie, getTheme()), new Callback() {
             @Override
             public void showAppIcon(Bitmap bitmap) {
                 Glide.with(PreviewActivity.this).asBitmap().load(bitmap).into(mIvAppIcon);

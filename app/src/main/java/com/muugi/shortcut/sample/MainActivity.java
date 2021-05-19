@@ -1,23 +1,30 @@
 package com.muugi.shortcut.sample;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.pm.ShortcutInfoCompatV2;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.muugi.shortcut.core.ShortcutV2;
+import com.muugi.shortcut.core.Executor;
+import com.muugi.shortcut.core.Shortcut;
+import com.muugi.shortcut.core.ShortcutAction;
+import com.muugi.shortcut.core.ShortcutInfoCompatExKt;
 import com.muugi.shortcut.sample.base.BasicAdapter;
 import com.muugi.shortcut.sample.base.MultipleTypeSupport;
 import com.muugi.shortcut.sample.bean.Contact;
 import com.muugi.shortcut.sample.bean.Group;
-import com.muugi.shortcut.setting.ShortcutPermission;
-import com.muugi.shortcut.utils.Logger;
+import com.muugi.shortcut.setting.AllRequest;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -31,19 +38,51 @@ public class MainActivity extends AppCompatActivity {
     private ContactAdapter mContactAdapter;
     private List<Group> mContacts;
 
-    private MultipleTypeSupport<Group> mMultipleTypeSupport = (list, group, position) -> {
+    private final MultipleTypeSupport<Group> mMultipleTypeSupport = (list, group, position) -> {
         if (group.getPosition() != -1) {
             return R.layout.item_title;
         }
         return R.layout.item_contact;
     };
 
+    private ShortcutPermissionTipDialog mTryTipDialog;
+
+
+    private void show() {
+        if (mTryTipDialog == null) {
+            mTryTipDialog = new ShortcutPermissionTipDialog();
+            mTryTipDialog.setTitle("已尝试添加到桌面");
+            mTryTipDialog.setTvContentTip("若添加失败，请前往系统设置，为此应用打开\"创建桌面快捷方式\"的权限。");
+            mTryTipDialog.setOnConfirmClickListener(v -> new AllRequest(MainActivity.this).start());
+        }
+        if (mTryTipDialog != null && !mTryTipDialog.isVisible()) {
+            mTryTipDialog.show(getSupportFragmentManager(), "shortcut");
+        }
+    }
+
+    private void dismiss() {
+        if (mTryTipDialog != null && mTryTipDialog.isVisible()) {
+            mTryTipDialog.dismiss();
+            mTryTipDialog = null;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: ");
-        ShortcutV2.get().addPinShortcutListener(mCallback);
+        Shortcut.Companion.getSingleInstance().addShortcutCallback(new Shortcut.Callback() {
+            @Override
+            public void onAsyncCreate(@NotNull String id, @NotNull String label) {
+                dismiss();
+                if (!Build.MANUFACTURER.equalsIgnoreCase("huawei") && !Build.MANUFACTURER.equalsIgnoreCase("samsung")) {
+                    Toast.makeText(MainActivity.this, "创建成功，id = " + id + ", label = " + label, Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d(TAG, "onAsyncCreate: " + "系统会提示");
+                }
+            }
+        });
         initRvContact();
     }
 
@@ -55,67 +94,49 @@ public class MainActivity extends AppCompatActivity {
         mRvContact.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         mRvContact.addItemDecoration(new DividerItemDecoration(this, VERTICAL));
         mContactAdapter.setOnItemClickListener((BasicAdapter.OnItemClickListener<Group>) (view, position, group) -> {
-            int check = ShortcutPermission.check(MainActivity.this);
-            if (check == ShortcutPermission.PERMISSION_GRANTED || check == ShortcutPermission.PERMISSION_UNKNOWN) {
-                Contact contact = mContacts.get(position).getContact();
-                Intent intentForShortcut = new Intent(MainActivity.this, TransparentActivity.class);
-                intentForShortcut.putExtra("name", contact.getNickname());
-                intentForShortcut.putExtra("id", contact.getUid());
-                intentForShortcut.putExtra("isShortcut", true);
-                ShortcutInfoCompatV2 shortcutInfoCompatV2 = new ShortcutInfoCompatV2.Builder(MainActivity.this, contact.getUid())
-                        .setShortLabel(contact.getNickname())
-                        .iconShapeWithLauncher(true)
-                        .autoCreateWithSameName(true)
-                        .updateIfExist(true)
-                        .setIcon(getResources().getDrawable(group.getContact().getDefaultDrawable()))
-                        .setIntent(intentForShortcut)
-                        .build();
-                ShortcutV2.get().requestPinShortcut(MainActivity.this, shortcutInfoCompatV2);
-            } else {
-                ShortcutPermissionTipDialog shortcutPermissionTipDialog = new ShortcutPermissionTipDialog();
-                shortcutPermissionTipDialog.show(getSupportFragmentManager(), "shortcut");
-                shortcutPermissionTipDialog.setTitle("快捷方式未开启");
-                shortcutPermissionTipDialog.setTvContentTip("检测到权限未开启，请前往系统设置，为此应用打开\"创建桌面快捷方式\"的权限。");
-                shortcutPermissionTipDialog.setOnConfirmClickListener(v -> ShortcutV2.get().setting(MainActivity.this));
-            }
+            Contact contact = mContacts.get(position).getContact();
+
+            Intent intentForShortcut = new Intent(MainActivity.this, TransparentActivity.class);
+            intentForShortcut.putExtra("name", contact.getNickname());
+            intentForShortcut.putExtra("id", contact.getUid());
+            intentForShortcut.putExtra("isShortcut", true);
+
+            ShortcutInfoCompat.Builder builder = new ShortcutInfoCompat.Builder(MainActivity.this, contact.getUid())
+                    .setShortLabel(contact.getNickname());
+            ShortcutInfoCompatExKt.setIcon(builder, ResourcesCompat.getDrawable(getResources(), group.getContact().getDefaultDrawable(), MainActivity.this.getTheme()), true, MainActivity.this);
+            ShortcutInfoCompatExKt.setIntent(builder, intentForShortcut, Intent.ACTION_VIEW);
+            ShortcutInfoCompat shortcutInfoCompat = builder.build();
+            Shortcut.Companion.getSingleInstance().requestPinShortcut(MainActivity.this,
+                    shortcutInfoCompat,
+                    true,
+                    true,
+                    new ShortcutAction() {
+                        @Override
+                        public void showPermissionDialog(@NotNull Context context, int check, @NotNull Executor executor) {
+                            ShortcutPermissionTipDialog shortcutPermissionTipDialog = new ShortcutPermissionTipDialog();
+                            shortcutPermissionTipDialog.show(getSupportFragmentManager(), "shortcut");
+                            shortcutPermissionTipDialog.setTitle("快捷方式未开启");
+                            shortcutPermissionTipDialog.setTvContentTip("检测到权限未开启，请前往系统设置，为此应用打开\"创建桌面快捷方式\"的权限。");
+                            shortcutPermissionTipDialog.setOnConfirmClickListener(v -> executor.executeSetting());
+                        }
+
+                        @Override
+                        public void onCreateAction(boolean requestPinShortcut, int check) {
+                            show();
+                        }
+
+                        @Override
+                        public void onUpdateAction(boolean updatePinShortcut) {
+                            Toast.makeText(MainActivity.this, "更新成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
     }
 
-    private ShortcutV2.Callback mCallback = new ShortcutV2.Callback() {
-        @Override
-        public void onSyncCreate(boolean pinShortcut) {
-            Logger.get().log(TAG, "onSyncCreate = " + pinShortcut);
-            Toast.makeText(MainActivity.this, "创建快捷方式，同步结果 = " + pinShortcut, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onAsyncCreate(String id, String label, String label_clone) {
-            Logger.get().log(TAG, "onAsyncCreate, id = " + id + ", label = " + label + ", clone = " + label_clone);
-            Toast.makeText(MainActivity.this, "创建快捷方式，异步结果, id = " + id + ", label = " + label + ", clone = " + label_clone, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onSyncUpdate(boolean updatePinShortcut) {
-            Logger.get().log(TAG, "onSyncUpdate = " + updatePinShortcut);
-            Toast.makeText(MainActivity.this, "更新快捷方式，异步结果 = " + updatePinShortcut, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onSyncAutoCreate(boolean autoCreatePinShortcut) {
-            Logger.get().log(TAG, "onSyncAutoCreate = " + autoCreatePinShortcut);
-            Toast.makeText(MainActivity.this, "创建快捷方式，同步结果（huawei） = " + autoCreatePinShortcut, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onAsyncAutoCreate(boolean updatePinShortcut, String id, String label, String label_clone) {
-            Logger.get().log(TAG, "onAsyncAutoCreate, id = " + id + ", label = " + label + ", clone = " + label_clone);
-            Toast.makeText(MainActivity.this, "创建快捷方式，异步结果（huawei）, id = " + id + ", label = " + label + ", clone = " + label_clone, Toast.LENGTH_SHORT).show();
-        }
-    };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ShortcutV2.get().removePinShortcutListener(mCallback);
+        dismiss();
     }
 }

@@ -12,7 +12,7 @@
 
     <application>
         <receiver
-            android:name="com.muugi.shortcut.core.AutoCreateBroadcastReceiver"
+            android:name="com.muugi.shortcut.special.AutoCreateBroadcastReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -21,7 +21,7 @@
         </receiver>
 
         <receiver
-            android:name="com.muugi.shortcut.core.NormalCreateBroadcastReceiver"
+            android:name="com.muugi.shortcut.broadcast.NormalCreateBroadcastReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

@@ -7,8 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.muugi.shortcut.core.Shortcut;
 
-import com.muugi.shortcut.core.ShortcutV2;
 import com.muugi.shortcut.setting.ShortcutPermission;
 
 /**
@@ -29,7 +29,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void initViews() {
         mTvShortcutPermissionState = findViewById(R.id.tv_shortcut_permission_state);
         mTvShortcutPermissionState.setOnClickListener(v -> {
-            ShortcutV2.get().setting(WelcomeActivity.this);
+            Shortcut.Companion.getSingleInstance().openSetting(WelcomeActivity.this);
         });
     }
 

@@ -36,7 +36,7 @@ public class RuntimeSettingPage {
     private static final String MIUI_VERSION_NAME = "ro.miui.ui.version.name";
     private static final String MARK = Build.MANUFACTURER.toLowerCase();
 
-    private Context mSource;
+    private final Context mSource;
 
     public RuntimeSettingPage(Context source) {
         this.mSource = source;

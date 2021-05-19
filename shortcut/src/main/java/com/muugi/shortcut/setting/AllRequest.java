@@ -7,7 +7,7 @@ import android.content.Context;
  */
 public class AllRequest implements SettingRequest {
 
-    private Context mContext;
+    private final Context mContext;
 
     public AllRequest(Context context) {
         mContext = context;
