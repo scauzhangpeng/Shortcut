@@ -41,11 +41,7 @@ open class Shortcut private constructor() {
         //判断权限，有权限就继续，无权限返回由app控制打开设置还是取消此次操作
         val check = ShortcutPermission.check(context)
         if (check == ShortcutPermission.PERMISSION_DENIED) {
-            shortcutAction.showPermissionDialog(context, check, object : Executor {
-                override fun executeSetting() {
-                    AllRequest(context).start()
-                }
-            })
+            shortcutAction.showPermissionDialog(context, check, DefaultExecutor(context))
         } else {
             //判断shortcut是否存在，如果存在则更新，不存在则创建
             val shortcutCore = if (fixHwOreo) HuaweiOreoShortcut() else ShortcutCore()

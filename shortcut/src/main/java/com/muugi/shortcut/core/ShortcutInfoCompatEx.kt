@@ -7,19 +7,21 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.TextUtils
 import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.muugi.shortcut.utils.ImageUtils
 
 fun ShortcutInfoCompat.Builder.setIcon(
     bitmap: Bitmap,
-    sharpWithLauncher: Boolean = true,
-    context: Context
-) {
+    context: Context,
+    sharpWithLauncher: Boolean = true
+): ShortcutInfoCompat.Builder {
     if (sharpWithLauncher && canSharpWithLauncher()) {
         setIcon(IconCompat.createWithBitmap(ImageUtils.merge(bitmap, context)))
     } else {
         setIcon(IconCompat.createWithBitmap(bitmap))
     }
+    return this
 }
 
 private fun canSharpWithLauncher(): Boolean {
@@ -29,17 +31,31 @@ private fun canSharpWithLauncher(): Boolean {
 
 fun ShortcutInfoCompat.Builder.setIcon(
     drawable: Drawable,
-    sharpWithLauncher: Boolean = true,
-    context: Context
-) {
+    context: Context,
+    sharpWithLauncher: Boolean = true
+): ShortcutInfoCompat.Builder {
     val drawable2Bitmap = ImageUtils.drawable2Bitmap(drawable)
-    setIcon(drawable2Bitmap, sharpWithLauncher, context)
+    return setIcon(drawable2Bitmap, context, sharpWithLauncher)
 }
 
-fun ShortcutInfoCompat.Builder.setIntent(intent: Intent, action: String = Intent.ACTION_VIEW) {
+fun ShortcutInfoCompat.Builder.setIcon(
+    drawableIds: Int,
+    context: Context,
+    sharpWithLauncher: Boolean = true
+): ShortcutInfoCompat.Builder {
+    val drawable =
+        ResourcesCompat.getDrawable(context.resources, drawableIds, context.applicationContext.theme)
+    val drawable2Bitmap = ImageUtils.drawable2Bitmap(drawable)
+    return setIcon(drawable2Bitmap, context, sharpWithLauncher)
+}
+
+fun ShortcutInfoCompat.Builder.setIntent(
+    intent: Intent,
+    action: String = Intent.ACTION_VIEW
+): ShortcutInfoCompat.Builder {
     if (TextUtils.isEmpty(intent.action)) {
         intent.action = action
     }
-    setIntent(intent)
+    return setIntent(intent)
 }
 

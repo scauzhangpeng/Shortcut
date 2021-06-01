@@ -72,7 +72,7 @@ open class ShortcutCore {
             bundle.putString(Shortcut.EXTRA_LABEL, shortcutInfoCompat.shortLabel.toString())
             val defaultIntentSender = IntentSenderHelper.getDefaultIntentSender(context, NormalCreateBroadcastReceiver.ACTION, NormalCreateBroadcastReceiver::class.java, bundle)
             val requestPinShortcut = ShortcutManagerCompat.requestPinShortcut(context, shortcutInfoCompat, defaultIntentSender)
-            shortcutAction.onCreateAction(requestPinShortcut, check)
+            shortcutAction.onCreateAction(requestPinShortcut, check, DefaultExecutor(context))
         }
     }
 

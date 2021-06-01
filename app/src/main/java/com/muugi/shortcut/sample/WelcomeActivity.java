@@ -56,7 +56,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     public void goToCreateShortcut(View view) {
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, MainActivityV2.class));
     }
 
     public void goToPreview(View view) {
