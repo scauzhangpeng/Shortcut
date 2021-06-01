@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import com.muugi.shortcut.broadcast.IntentSenderHelper
+import com.muugi.shortcut.core.DefaultExecutor
 import com.muugi.shortcut.core.Shortcut
 import com.muugi.shortcut.core.Shortcut.Companion.TAG
 import com.muugi.shortcut.core.ShortcutAction
@@ -83,6 +84,6 @@ class HuaweiOreoShortcut : ShortcutCore() {
             shortcutInfoCompat,
             defaultIntentSender
         )
-        shortcutAction.onCreateAction(requestPinShortcut, check)
+        shortcutAction.onCreateAction(requestPinShortcut, check, DefaultExecutor(context))
     }
 }
