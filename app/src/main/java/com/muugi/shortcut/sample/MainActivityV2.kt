@@ -21,19 +21,19 @@ class MainActivityV2: AppCompatActivity() {
 
     private val itemClick: BasicAdapter.OnItemClickListener<MockShortcutInfo> by lazy {
         BasicAdapter.OnItemClickListener<MockShortcutInfo> { _, _, t ->
-            val intentForShortcut =
-                with(Intent(this@MainActivityV2, TransparentActivity::class.java)) {
+
+            val shortcutInfoCompat: ShortcutInfoCompat = ShortcutInfoCompat.Builder(this@MainActivityV2, t.uid).run {
+                setShortLabel(t.label)
+                setAlwaysBadged()
+                setIcon(t.defaultRes, this@MainActivityV2)
+                val intentForShortcut = Intent(this@MainActivityV2, TransparentActivity::class.java).apply {
                     putExtra("name", t.label)
                     putExtra("id", t.uid)
                     putExtra("isShortcut", true)
                 }
-
-            val shortcutInfoCompat = ShortcutInfoCompat.Builder(this@MainActivityV2, t.uid)
-                .setShortLabel(t.label)
-                .setAlwaysBadged()
-                .setIcon(t.defaultRes, this@MainActivityV2)
-                .setIntent(intentForShortcut, Intent.ACTION_VIEW)
-                .build()
+                setIntent(intentForShortcut, Intent.ACTION_VIEW)
+                build()
+            }
 
 
 
