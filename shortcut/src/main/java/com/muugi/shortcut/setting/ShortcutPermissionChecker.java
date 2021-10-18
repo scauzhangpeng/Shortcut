@@ -31,14 +31,19 @@ public class ShortcutPermissionChecker {
         try {
             Class<?> PermissionManager = Class.forName("com.huawei.hsm.permission.PermissionManager");
             Method canSendBroadcast = PermissionManager.getDeclaredMethod("canSendBroadcast", Context.class, Intent.class);
-            boolean invokeResult = (boolean) canSendBroadcast.invoke(PermissionManager, context, intent);
-            Logger.get().log(TAG, "EMUI check permission canSendBroadcast invoke result = " + invokeResult);
-            if (invokeResult) {
-                return ShortcutPermission.PERMISSION_GRANTED;
+            Object invoke = canSendBroadcast.invoke(PermissionManager, context, intent);
+            if (invoke != null) {
+                boolean invokeResult = (boolean) invoke;
+                Logger.get().log(TAG, "EMUI check permission canSendBroadcast invoke result = " + invokeResult);
+                if (invokeResult) {
+                    return ShortcutPermission.PERMISSION_GRANTED;
+                } else {
+                    return ShortcutPermission.PERMISSION_DENIED;
+                }
             } else {
-                return ShortcutPermission.PERMISSION_DENIED;
+                return ShortcutPermission.PERMISSION_UNKNOWN;
             }
-        } catch (ClassNotFoundException e) {//Mutil-catch require API level 19
+        } catch (ClassNotFoundException e) {//Multiple-catch require API level 19
             Logger.get().log(TAG, e.getMessage(), e);
             return ShortcutPermission.PERMISSION_UNKNOWN;
         } catch (NoSuchMethodException e) {
@@ -48,6 +53,9 @@ public class ShortcutPermissionChecker {
             Logger.get().log(TAG, e.getMessage(), e);
             return ShortcutPermission.PERMISSION_UNKNOWN;
         } catch (InvocationTargetException e) {
+            Logger.get().log(TAG, e.getMessage(), e);
+            return ShortcutPermission.PERMISSION_UNKNOWN;
+        } catch (Exception e) {
             Logger.get().log(TAG, e.getMessage(), e);
             return ShortcutPermission.PERMISSION_UNKNOWN;
         }

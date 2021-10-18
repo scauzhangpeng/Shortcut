@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.TextUtils
+import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.IconCompat
@@ -24,6 +25,7 @@ fun ShortcutInfoCompat.Builder.setIcon(
     return this
 }
 
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.O)
 private fun canSharpWithLauncher(): Boolean {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 }

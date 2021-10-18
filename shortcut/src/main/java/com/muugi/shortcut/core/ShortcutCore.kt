@@ -9,8 +9,6 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import com.muugi.shortcut.broadcast.IntentSenderHelper
 import com.muugi.shortcut.broadcast.NormalCreateBroadcastReceiver
-import com.muugi.shortcut.core.Shortcut.Companion.TAG
-import com.muugi.shortcut.utils.Logger
 
 /**
  * Created by ZP on 2020/4/20.

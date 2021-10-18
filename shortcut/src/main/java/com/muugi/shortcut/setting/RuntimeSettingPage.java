@@ -44,13 +44,11 @@ public class RuntimeSettingPage {
 
     /**
      * Start.
-     *
-     * @return true if successful, otherwise is false.
      */
     public void start() {
         Intent intent;
         if (MARK.contains("huawei")) {
-            intent = huaweiApi(mSource);
+            intent = huaweiApi();
         } else if (MARK.contains("xiaomi")) {
             intent = xiaomiApi(mSource);
         } else if (MARK.contains("oppo")) {
@@ -77,10 +75,7 @@ public class RuntimeSettingPage {
         return intent;
     }
 
-    private static Intent huaweiApi(Context context) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            return defaultApi(context);
-//        }
+    private static Intent huaweiApi() {
         Intent intent = new Intent();
         intent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.permissionmanager.ui.MainActivity"));
         return intent;

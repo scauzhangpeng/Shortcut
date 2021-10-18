@@ -14,7 +14,6 @@ import com.muugi.shortcut.core.ShortcutAction
 import com.muugi.shortcut.core.ShortcutCore
 import com.muugi.shortcut.utils.Logger
 import java.lang.RuntimeException
-import java.util.*
 
 class HuaweiOreoShortcut : ShortcutCore() {
 
@@ -44,7 +43,7 @@ class HuaweiOreoShortcut : ShortcutCore() {
     }
 
     private fun needCheckSameName(): Boolean {
-        return Build.MANUFACTURER.toLowerCase(Locale.getDefault()) == "huawei" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1
+        return "huawei".equals(Build.MANUFACTURER, false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1
     }
 
     override fun createShortcut(
