@@ -15,7 +15,7 @@ import com.muugi.shortcut.core.ShortcutCore
 import com.muugi.shortcut.utils.Logger
 import java.lang.RuntimeException
 
-class HuaweiOreoShortcut : ShortcutCore() {
+class CreateAndUpdateShortcut : ShortcutCore() {
 
     override fun isShortcutExit(context: Context, id: String, label: CharSequence): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -42,7 +42,14 @@ class HuaweiOreoShortcut : ShortcutCore() {
         return false
     }
 
+    /**
+     * 华为8.0、8.1同label无法创建快捷方式
+     * Vivo 8.1.0、9.0同label无法创建快捷方式
+     */
     private fun needCheckSameName(): Boolean {
+        if ("vivo".equals(Build.MANUFACTURER, false)) {
+            return true
+        }
         return "huawei".equals(Build.MANUFACTURER, false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1
     }
 

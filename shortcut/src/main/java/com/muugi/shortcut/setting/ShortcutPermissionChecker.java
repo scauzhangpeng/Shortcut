@@ -69,13 +69,15 @@ public class ShortcutPermissionChecker {
             Logger.get().log(TAG, "contentResolver is null");
             return ShortcutPermission.PERMISSION_UNKNOWN;
         }
-        Uri parse = Uri.parse("content://com.bbk.launcher2.settings/favorites");
-        Cursor query = contentResolver.query(parse, null, null, null, null);
-        if (query == null) {
-            Logger.get().log(TAG, "cursor is null (Uri : content://com.bbk.launcher2.settings/favorites)");
-            return ShortcutPermission.PERMISSION_UNKNOWN;
-        }
+        Cursor query = null;
         try {
+            Uri parse = Uri.parse("content://com.bbk.launcher2.settings/favorites");
+            query = contentResolver.query(parse, null, null, null, null);
+            if (query == null) {
+                Logger.get().log(TAG, "cursor is null (Uri : content://com.bbk.launcher2.settings/favorites)");
+                return ShortcutPermission.PERMISSION_UNKNOWN;
+            }
+
             while (query.moveToNext()) {
                 String titleByQueryLauncher = query.getString(query.getColumnIndexOrThrow("title"));
                 Logger.get().log(TAG, "title by query is " + titleByQueryLauncher);
@@ -94,7 +96,9 @@ public class ShortcutPermissionChecker {
         } catch (Exception e) {
             Logger.get().log(TAG, e.getMessage(), e);
         } finally {
-            query.close();
+            if (query != null) {
+                query.close();
+            }
         }
         return ShortcutPermission.PERMISSION_UNKNOWN;
     }

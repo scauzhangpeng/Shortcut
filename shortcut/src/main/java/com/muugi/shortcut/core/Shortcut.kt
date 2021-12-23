@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.content.pm.ShortcutInfoCompat
 import com.muugi.shortcut.setting.AllRequest
 import com.muugi.shortcut.setting.ShortcutPermission
-import com.muugi.shortcut.special.HuaweiOreoShortcut
+import com.muugi.shortcut.special.CreateAndUpdateShortcut
 
 open class Shortcut private constructor() {
     companion object {
@@ -44,7 +44,7 @@ open class Shortcut private constructor() {
             shortcutAction.showPermissionDialog(context, check, DefaultExecutor(context))
         } else {
             //判断shortcut是否存在，如果存在则更新，不存在则创建
-            val shortcutCore = if (fixHwOreo) HuaweiOreoShortcut() else ShortcutCore()
+            val shortcutCore = if (fixHwOreo) CreateAndUpdateShortcut() else ShortcutCore()
             shortcutCore.createShortcut(context, shortcutInfoCompat, updateIfExit, shortcutAction, check)
         }
     }
